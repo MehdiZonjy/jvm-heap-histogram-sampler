@@ -2,7 +2,7 @@
 set -e
 
 usage () {
-    echo "Usage: -i <Interval in seconds> -n <Samples Count> -f <Histograms Prefix> <pid>"
+    echo "Usage: -i <Interval in seconds> -n <Samples Count> -f <Thread Dump prefix> <pid>"
 }
 
 RGX_NUMERIC='^[0-9]+$'
@@ -67,12 +67,12 @@ i=0
 while [ $i -lt $SAMPLES ]
 do
   echo "Captuing Sample $i of $SAMPLES..."
-  jmap -histo $JVM_PID > "${PREFIX}-${i}.histo"
+  jcmd $JVM_PID Thread.print > "${PREFIX}-${i}.threaddump"
   echo "Sleep for $INTERVAL seconds..."
   sleep $INTERVAL
   i=$((i + 1))
 done
 
 echo "Creating archieve ${PREFIX}.tar.gz"
-find . -name "*.histo" | tar -czf "$PREFIX.tar.gz" -T -
+find . -name "*.threaddump" | tar -czf "$PREFIX.tar.gz" -T -
 
